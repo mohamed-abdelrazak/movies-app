@@ -22,6 +22,7 @@ function App() {
   const [errorMessage, setErrorMessage] = useState("");
   const [allMovies, setAllMovies] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isTrendingLoading, setIsTrendingLoading] = useState(false);
   const [debounceSearchTerm, setDebounceSearchTerm] = useState("");
   const [trendingMovies, setTrendingMovies] = useState([]);
 
@@ -60,12 +61,15 @@ function App() {
   };
 
   const loadTrendingMovies = async () => {
+    setIsTrendingLoading(true);
     try {
       const movies = await getTrendingMovies();
 
       setTrendingMovies(movies);
+      setIsTrendingLoading(false);
     } catch (error) {
       console.log(`Error fetching trending movies: ${error}`);
+      setIsTrendingLoading(false);
     }
   };
 
@@ -78,7 +82,7 @@ function App() {
   }, []);
 
   return (
-    <main>
+    <main className=" overflow-x-auto hide-scrollbar">
       <div className="pattern" />
 
       <div className="wrapper">
@@ -91,10 +95,12 @@ function App() {
           <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
         </header>
 
-        {trendingMovies.length > 0 && (
-          <section className="trending">
-            <h2>Trending Movies</h2>
+        <section className="trending">
+          <h2>Trending Movies</h2>
 
+          {isTrendingLoading ? (
+            <Spinner />
+          ) : (
             <ul>
               {trendingMovies.map((movie, index) => (
                 <li key={movie.$id}>
@@ -103,8 +109,8 @@ function App() {
                 </li>
               ))}
             </ul>
-          </section>
-        )}
+          )}
+        </section>
 
         <section className="all-movies">
           <h2>All Movies</h2>
